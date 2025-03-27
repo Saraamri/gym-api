@@ -1,6 +1,6 @@
 package com.example.demo.entities;
 import jakarta.persistence.*;
-
+//import org.hibernate.validator.constraints.Length;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +20,7 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name="firstName" , length = 10,nullable = true)
-   // @Size(max=10, message =" le prénom ne doit pas depasser 10 caractéres")
+   // @Length(max=10, message =" le prénom ne doit pas depasser 10 caractéres")
     private String firstName;
     private String lastName;
     @Column(length=100,nullable = false,unique = true)
@@ -29,6 +29,13 @@ public class UserEntity {
     private String password ;
     private String confPassword;
     private String specialite;
+    private String telephone;  // Pour l'adhérent
+
+   // @OneToOne(mappedBy = "adherent", cascade = CascadeType.ALL)
+   // private ProgressionPhysique progressionPhysique; // Pour les adhérents
+
+    @OneToMany(mappedBy = "coach", cascade = CascadeType.ALL)
+    private List<SeanceIndividuelle> seances;
     @ManyToMany
     @JoinTable(name = "userrole",joinColumns = @JoinColumn(name = "id"),inverseJoinColumns = @JoinColumn(name ="idrole"))
     private Set<Role> role = new HashSet<>();
