@@ -12,7 +12,14 @@ public class CoursCollectif {
     private Long id;
     private String nom;
     private String description;
-
+    private int dureeTotale;
+    private String niveau;
+    private String jours;
+    private String horaire;
+    private String imageUrl;
+    @ManyToOne
+    @JoinColumn(name = "coach_id")
+    private UserEntity coach;
     @OneToMany(mappedBy = "coursCollectif", cascade = CascadeType.ALL)
     private List<SeanceIndividuelle> seances;
 
