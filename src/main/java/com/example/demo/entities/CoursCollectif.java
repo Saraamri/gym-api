@@ -20,7 +20,6 @@ public class CoursCollectif {
     @ManyToOne
     @JoinColumn(name = "coach_id")
     private UserEntity coach;
-    @OneToMany(mappedBy = "coursCollectif", cascade = CascadeType.ALL)
-    private List<SeanceIndividuelle> seances;
+
 
 }

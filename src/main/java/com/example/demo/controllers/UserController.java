@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 import com.example.demo.entities.UserEntity;
 import com.example.demo.services.UserInterface;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,7 +29,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     @PostMapping("/add")
-    public UserEntity addUser(@RequestBody UserEntity user)
+    public UserEntity addUser( @Valid @RequestBody UserEntity user)
     {
 
         return userInterface.addUser(user);

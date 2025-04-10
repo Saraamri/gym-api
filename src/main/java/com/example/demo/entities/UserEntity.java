@@ -1,6 +1,6 @@
 package com.example.demo.entities;
 import jakarta.persistence.*;
-//import org.hibernate.validator.constraints.Length;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,27 +19,54 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="firstName" , length = 10,nullable = true)
-   // @Length(max=10, message =" le prénom ne doit pas depasser 10 caractéres")
+    @NotNull(message = "Le prénom ne peut pas être nul.")
+    @Size(max = 10, message = "Le prénom ne doit pas dépasser 10 caractères.")
+    @Column(name = "firstName", nullable = false)
+
+
     private String firstName;
+
+    @NotNull(message = "Le nom ne peut pas être nul.")
+
     private String lastName;
-    @Column(length=100,nullable = false,unique = true)
+
+    @NotNull(message = "L'email ne peut pas être nul.")
+    @Email(message = "L'email doit être dans un format valide.")
+    @Column(length = 100, nullable = false, unique = true)
     private String email;
+    @NotNull(message = "Le nom d'utilisateur ne peut pas être nul.")
+    @Size(min = 5, max = 15, message = "Le nom d'utilisateur doit avoir entre 5 et 15 caractères.")
     private  String username;
+    @NotNull(message = "Le mot de passe ne peut pas être nul.")
+    @Size(min = 8, message = "Le mot de passe doit contenir au moins 8 caractères.")
     private String password ;
+    @NotNull(message = "La confirmation du mot de passe ne peut pas être nulle.")
+    @Transient
     private String confPassword;
+
     private String specialite;
-    private String telephone;  // Pour l'adhérent
+    @NotNull(message = "Le numéro de téléphone ne peut pas être nul.")
+    @Pattern(regexp = "^[0-9]{8}$", message = "Le téléphone doit contenir exactement 8 chiffres.")
+    private String telephone;// Pour l'adhérent
+    @Min(value = 18, message = "L'âge doit être supérieur ou égal à 18.")
+    @Max(value = 120, message = "L'âge doit être inférieur ou égal à 120.")
 
-   // @OneToOne(mappedBy = "adherent", cascade = CascadeType.ALL)
-   // private ProgressionPhysique progressionPhysique; // Pour les adhérents
+    private Double age;
 
-    @OneToMany(mappedBy = "coach", cascade = CascadeType.ALL)
-    private List<SeanceIndividuelle> seances;
+    private boolean isActive = true;
+    private boolean isAccountNonLocked = true;
+    private String adresse;
+    private String profilePicture;
+
+    @OneToMany(mappedBy = "coach")
+    private List<SeanceIndividuelle> seancesCoaches;
+
+    @OneToMany(mappedBy = "adherent")
+    private List<SeanceIndividuelle> seancesAdherents;
     @ManyToMany
     @JoinTable(name = "userrole",joinColumns = @JoinColumn(name = "id"),inverseJoinColumns = @JoinColumn(name ="idrole"))
     private Set<Role> role = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> comments;
+   // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   // private List<Comment> comments;
 }
