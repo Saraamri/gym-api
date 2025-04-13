@@ -6,6 +6,7 @@ import com.example.demo.services.ObjectifInterface;
 import com.example.demo.services.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -14,27 +15,35 @@ import java.util.List;
 public class ObjectifController {
 
     @Autowired
-    private ObjectifInterface objectifService; // Utilisation de l'interface
-
+    private ObjectifInterface objectifInterface; // Utilisation de l'interface
     @Autowired
-    private UserInterface userService;
+    private UserInterface userInterface;
 
-    @PostMapping("/{userId}")
-    public Objectif addObjectif(@PathVariable Long userId, @RequestBody Objectif objectif) {
-        UserEntity user = userService.getUserById(userId); // Récupère l'utilisateur par son ID
-        if (user != null) {
-            objectif.setUser(user); // Associe l'objectif à l'utilisateur
-            return objectifService.saveObjectif(objectif); // Sauvegarde l'objectif via l'interface
-        } else {
-            return null; // Retourner null si l'utilisateur n'existe pas
+    @PostMapping("/add/{userId}")
+    public ResponseEntity<?> addObjectif(@PathVariable Long userId, @RequestBody Objectif objectif) {
+        UserEntity user = userInterface.getUserById(userId);
+
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Utilisateur non trouvé avec l'ID : " + userId);
         }
+
+        objectif.setUser(user);
+        Objectif saved = objectifInterface.saveObjectif(objectif);
+
+        return ResponseEntity.ok(saved);
     }
+
+
+
+
+
+
 
     @GetMapping("/{userId}")
     public List<Objectif> getObjectifsByUser(@PathVariable Long userId) {
-        UserEntity user = userService.getUserById(userId); // Récupère l'utilisateur
+        UserEntity user = userInterface.getUserById(userId); // Récupère l'utilisateur
         if (user != null) {
-            return objectifService.getObjectifsByUser(user); // Retourne la liste des objectifs via l'interface
+            return objectifInterface.getObjectifsByUser(user); // Retourne la liste des objectifs via l'interface
         } else {
             return null; // Retourner null si l'utilisateur n'existe pas
         }
@@ -42,6 +51,6 @@ public class ObjectifController {
 
     @DeleteMapping("/{objectifId}")
     public void deleteObjectif(@PathVariable Long objectifId) {
-        objectifService.deleteObjectif(objectifId); // Supprime l'objectif via l'interface
+        objectifInterface.deleteObjectif(objectifId); // Supprime l'objectif via l'interface
     }
 }

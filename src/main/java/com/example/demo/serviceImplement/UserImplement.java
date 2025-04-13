@@ -102,4 +102,10 @@ public class UserImplement implements UserInterface {
     public List<UserEntity> getUsersByEmail(String un) {
         return userRepository.getUsersByEmail(un);
     }
+
+    @Override
+    public UserEntity getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
 }

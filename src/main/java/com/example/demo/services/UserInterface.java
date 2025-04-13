@@ -14,4 +14,6 @@ public interface UserInterface {
     UserEntity getuserByUsername(String un);
     List<UserEntity> getUsersSW(String un);
     List<UserEntity> getUsersByEmail(String un);
+
+    UserEntity getUserById(Long userId);
 }

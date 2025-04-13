@@ -24,4 +24,4 @@ public class Progress {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 }
-//........
+

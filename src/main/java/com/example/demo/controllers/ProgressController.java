@@ -5,6 +5,7 @@ import com.example.demo.entities.UserEntity;
 import com.example.demo.services.ProgressInterface;
 import com.example.demo.services.UserInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,37 +16,40 @@ import java.util.List;
 public class ProgressController {
 
     @Autowired
-    private ProgressInterface progressService; // Interface pour gérer les progrès
+    private ProgressInterface progressInterface;
 
     @Autowired
-    private UserInterface userService; // Interface pour gérer les utilisateurs
+    private UserInterface userInterface;
 
-    // Méthode pour ajouter un progrès
-    @PostMapping("/{userId}")
-    public Progress addProgress(@PathVariable Long userId, @RequestBody Progress progress) {
-        UserEntity user = userService.getUserById(userId); // Appel à la méthode getUserById via l'instance userService
-        if (user != null) {
-            progress.setUser(user); // Associer l'utilisateur au progrès
-            return progressService.saveProgress(progress); // Sauvegarder le progrès
-        } else {
-            return null; // Si l'utilisateur n'existe pas, retourne null
+    // Ajouter un progrès pour un utilisateur spécifique
+    @PostMapping("/add/{userId}")
+    public ResponseEntity<?> addProgress(@PathVariable Long userId, @RequestBody Progress progress) {
+        UserEntity user = userInterface.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("Utilisateur non trouvé avec l'ID : " + userId);
         }
+
+        progress.setUser(user);
+        Progress savedProgress = progressInterface.saveProgress(progress);
+        return ResponseEntity.ok(savedProgress);
     }
 
-    // Méthode pour obtenir les progrès d'un utilisateur
+    // Obtenir tous les progrès d’un utilisateur
     @GetMapping("/{userId}")
-    public List<Progress> getProgressByUser(@PathVariable Long userId) {
-        UserEntity user = userService.getUserById(userId); // Appel à la méthode getUserById via l'instance userService
-        if (user != null) {
-            return progressService.getProgressByUser(user); // Retourne les progrès de l'utilisateur
-        } else {
-            return null; // Si l'utilisateur n'existe pas, retourne null
+    public ResponseEntity<?> getProgressByUser(@PathVariable Long userId) {
+        UserEntity user = userInterface.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.status(404).body("Utilisateur non trouvé avec l'ID : " + userId);
         }
+
+        List<Progress> progressList = progressInterface.getProgressByUser(user);
+        return ResponseEntity.ok(progressList);
     }
 
-    // Méthode pour supprimer un progrès par son ID
+    // Supprimer un progrès par son ID
     @DeleteMapping("/{progressId}")
-    public void deleteProgress(@PathVariable Long progressId) {
-        progressService.deleteProgress(progressId); // Supprime le progrès
+    public ResponseEntity<?> deleteProgress(@PathVariable Long progressId) {
+        progressInterface.deleteProgress(progressId);
+        return ResponseEntity.ok("Progrès supprimé avec succès (ID : " + progressId + ")");
     }
 }
