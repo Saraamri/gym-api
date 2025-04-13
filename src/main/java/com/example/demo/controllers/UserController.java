@@ -34,6 +34,7 @@ public class UserController {
 
         return userInterface.addUser(user);
     }
+    //methodelogin (finduserbyusername
 
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable Long id){
