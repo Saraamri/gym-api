@@ -1,7 +1,7 @@
 package com.example.demo.entities;
 
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,19 +16,40 @@ public class Objectif {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "L'utilisateur est requis")
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity user; // L'utilisateur associé à l'objectif
+    private UserEntity user;
 
-    private double poids; // Poids cible
-    private double taille; // Taille cible
-    private double imc; // IMC cible
-    private double bodyFatPercentage; // Pourcentage de graisse corporelle cible
-    private double muscleMass; // Masse musculaire cible
-    private double waistCircumference; // Tour de taille cible
-    private int trainingFrequency; // Fréquence d'entraînement cible (nombre de jours par semaine)
-    private double strengthGoal; // Objectif de force
-    private double performanceGoal; // Objectif de performance (par exemple, temps pour un 5 km)
-    private LocalDate targetDate; // Date cible pour atteindre l'objectif
+    @Positive(message = "Le poids cible doit être supérieur à 0")
+    private double poids;
+
+    @Positive(message = "La taille cible doit être supérieure à 0")
+    private double taille;
+
+    @Positive(message = "L'IMC cible doit être supérieur à 0")
+    private double imc;
+
+    @PositiveOrZero(message = "Le pourcentage de graisse corporelle doit être positif ou nul")
+    private double bodyFatPercentage;
+
+    @PositiveOrZero(message = "La masse musculaire doit être positive ou nulle")
+    private double muscleMass;
+
+    @PositiveOrZero(message = "Le tour de taille doit être positif ou nul")
+    private double waistCircumference;
+
+    @Min(value = 1, message = "La fréquence d'entraînement doit être au moins de 1 jour/semaine")
+    @Max(value = 7, message = "La fréquence d'entraînement ne peut pas dépasser 7 jours/semaine")
+    private int trainingFrequency;
+
+    @PositiveOrZero(message = "L'objectif de force doit être positif ou nul")
+    private double strengthGoal;
+
+    @PositiveOrZero(message = "L'objectif de performance doit être positif ou nul")
+    private double performanceGoal;
+
+    @NotNull(message = "La date cible est requise")
+    @Future(message = "La date cible doit être dans le futur")
+    private LocalDate targetDate;
 }
-

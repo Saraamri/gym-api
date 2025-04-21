@@ -4,11 +4,17 @@ import com.example.demo.entities.Objectif;
 import com.example.demo.entities.UserEntity;
 import com.example.demo.services.ObjectifInterface;
 import com.example.demo.services.UserInterface;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/objectif")
@@ -20,8 +26,9 @@ public class ObjectifController {
     @Autowired
     private UserInterface userInterface;
 
+
     @PostMapping("/add/{userId}")
-    public ResponseEntity<?> addObjectif(@PathVariable Long userId, @RequestBody Objectif objectif) {
+    public ResponseEntity<?> addObjectif(@PathVariable Long userId, @RequestBody @Valid Objectif objectif) {
         UserEntity user = userInterface.getUserById(userId);
 
         if (user == null) {
@@ -33,11 +40,6 @@ public class ObjectifController {
 
         return ResponseEntity.ok(saved);
     }
-
-
-
-
-
 
 
     @GetMapping("/{userId}")

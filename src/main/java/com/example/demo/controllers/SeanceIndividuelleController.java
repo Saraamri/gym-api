@@ -2,11 +2,17 @@ package com.example.demo.controllers;
 
 import com.example.demo.entities.SeanceIndividuelle;
 import com.example.demo.services.SeanceIndividuelleInterface;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/seances")
@@ -16,8 +22,9 @@ public class SeanceIndividuelleController {
     @Autowired
     private SeanceIndividuelleInterface service;
 
+
     @PostMapping
-    public ResponseEntity<SeanceIndividuelle> create(@RequestBody SeanceIndividuelle s) {
+    public ResponseEntity<SeanceIndividuelle> create(@RequestBody  @Valid SeanceIndividuelle s) {
         return ResponseEntity.ok(service.addSeance(s));
     }
 
@@ -52,7 +59,7 @@ public class SeanceIndividuelleController {
     }
     // Coach propose une séance
     @PostMapping("/proposer")
-    public ResponseEntity<SeanceIndividuelle> proposerParCoach(@RequestBody SeanceIndividuelle s) {
+    public ResponseEntity<SeanceIndividuelle> proposerParCoach(@RequestBody @Valid SeanceIndividuelle s) {
         s.setProposeeParCoach(true); // Indiquer que c'est une séance proposée par le coach
         s.setStatut("proposée");
         return ResponseEntity.ok(service.addSeance(s));
@@ -60,7 +67,7 @@ public class SeanceIndividuelleController {
 
     // Adhérent fait une demande de séance
     @PostMapping("/demande")
-    public ResponseEntity<SeanceIndividuelle> demandeParAdherent(@RequestBody SeanceIndividuelle s) {
+    public ResponseEntity<SeanceIndividuelle> demandeParAdherent(@RequestBody  @Valid SeanceIndividuelle s) {
         s.setProposeeParCoach(false); // Indiquer que c'est une demande de l'adhérent
         s.setStatut("en attente");
         return ResponseEntity.ok(service.addSeance(s));

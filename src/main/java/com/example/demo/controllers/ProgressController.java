@@ -4,11 +4,17 @@ import com.example.demo.entities.Progress;
 import com.example.demo.entities.UserEntity;
 import com.example.demo.services.ProgressInterface;
 import com.example.demo.services.UserInterface;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/progress")
@@ -21,9 +27,10 @@ public class ProgressController {
     @Autowired
     private UserInterface userInterface;
 
+
     // Ajouter un progrès pour un utilisateur spécifique
     @PostMapping("/add/{userId}")
-    public ResponseEntity<?> addProgress(@PathVariable Long userId, @RequestBody Progress progress) {
+    public ResponseEntity<?> addProgress(@PathVariable Long userId, @RequestBody @Valid Progress progress) {
         UserEntity user = userInterface.getUserById(userId);
         if (user == null) {
             return ResponseEntity.badRequest().body("Utilisateur non trouvé avec l'ID : " + userId);

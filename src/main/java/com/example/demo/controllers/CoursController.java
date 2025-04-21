@@ -2,11 +2,18 @@ package com.example.demo.controllers;
 
 import com.example.demo.entities.CoursCollectif;
 import com.example.demo.services.CoursCollectifInterface;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-        import java.util.*;
+import java.util.*;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/coursCollectifs")
@@ -14,10 +21,15 @@ import org.springframework.web.bind.annotation.*;
 public class CoursController {
     @Autowired
     private CoursCollectifInterface coursCollectifInterface;
+
     // Ajouter un cours
-    @PostMapping("/add")
-    public ResponseEntity<CoursCollectif> addCours(@RequestBody CoursCollectif cours) {
-        return ResponseEntity.ok(coursCollectifInterface.addCours(cours));
+    @PostMapping(path="/add",consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+
+    public ResponseEntity<CoursCollectif> addCours(
+             @RequestPart ("cours") CoursCollectif cours,
+            @RequestPart("image") MultipartFile imageFile) {
+
+        return ResponseEntity.ok(coursCollectifInterface.addCours(cours, imageFile));
     }
 
     // Supprimer un cours
@@ -31,15 +43,31 @@ public class CoursController {
 
     // Ajouter une liste de cours
     @PostMapping("/addList")
-    public ResponseEntity<List<CoursCollectif>> addListCours(@RequestBody List<CoursCollectif> coursList) {
+    public ResponseEntity<List<CoursCollectif>> addListCours(@RequestBody @Valid List<CoursCollectif> coursList) {
         return ResponseEntity.ok(coursCollectifInterface.addListCours(coursList));
     }
 
     // Modifier un cours
-    @PutMapping("/update/{id}")
-    public ResponseEntity<CoursCollectif> updateCours(@PathVariable Long id, @RequestBody CoursCollectif cours) {
-        return ResponseEntity.ok(coursCollectifInterface.updateCours(id, cours));
+    @PutMapping(value = "/updateWithImage/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CoursCollectif> updateCoursWithImage(
+            @PathVariable Long id,
+            @RequestPart("cours") String coursJson,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            CoursCollectif cours = objectMapper.readValue(coursJson, CoursCollectif.class);
+
+            CoursCollectif updatedCours = coursCollectifInterface.updateCoursWithImage(id, cours, imageFile);
+            return ResponseEntity.ok(updatedCours);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
+
+
 
     // Récupérer tous les cours
     @GetMapping("/getAll")

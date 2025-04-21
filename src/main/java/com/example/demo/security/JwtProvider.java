@@ -35,7 +35,7 @@ public class JwtProvider {
     public String generateToken(Authentication authentication) {
         Map<String, Object> claims = new HashMap<>();
         UserEntity user = userRepo.findByUsername(authentication.getName());
-        claims.put("role", user.getRole());
+        claims.put("role", user.getRole().name());
         // Build JWT token with claims, subject, issued time, expiration time, and signing algorithm
         // Token valid for 3 minutes
         return Jwts.builder()

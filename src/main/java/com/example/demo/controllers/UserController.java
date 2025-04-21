@@ -1,94 +1,91 @@
 package com.example.demo.controllers;
-import com.example.demo.Dto.AuthRequest;
-import com.example.demo.Dto.AuthResponse;
+
 import com.example.demo.entities.UserEntity;
-import com.example.demo.services.AuthService;
 import com.example.demo.services.UserInterface;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/user")
 @CrossOrigin(origins = "*")
 public class UserController {
+
     @Autowired
-    UserInterface userInterface;
+    private UserInterface userInterface;
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
+    @PostMapping(path = "/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> addUser(
+            @RequestPart("user") @Valid UserEntity user,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture
+    ){
+        if (userInterface.existsByEmail(user.getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Erreur : L'email est déjà utilisé !"));
+        }
+        if (userInterface.existsByUsername(user.getUsername())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Erreur : Le nom d'utilisateur est déjà utilisé !"));
+        }
+
+        UserEntity savedUser = userInterface.addUser(user, profilePicture);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
 
-
-
-
-
-
-    @PostMapping("/add")
-    public UserEntity addUser( @Valid @RequestBody UserEntity user) {return userInterface.addUser(user);}
     @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable Long id){
+    public void deleteUser(@PathVariable Long id) {
         userInterface.deleteUser(id);
     }
-    @DeleteMapping("/deleteuser")
-    public void deleteUsers(@RequestParam Long id){
-        userInterface.deleteUser(id);
+
+    @PostMapping("/addList")
+    public List<UserEntity> addListUsers(@RequestBody List<UserEntity> users) {
+        return userInterface.addListUsers(users);
     }
-    @PostMapping("addlistusers")
-    public List<UserEntity> addlistusers(@RequestBody List<UserEntity> users) {return userInterface.addListUsers(users);}
-    @PostMapping("/addwithconfpassword")
-    public String addUserWTCP(@RequestBody UserEntity user) {return userInterface.addUserWTCP(user);}
-    @PostMapping("/adduserWTUN")
-    public String addUserWTUN(@RequestBody UserEntity user)
-    {
-        return userInterface.addUserWTUN(user);
+
+
+    @PutMapping(path = "/updateWithPicture/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateUserWithPicture(
+            @PathVariable Long id,
+            @RequestPart("user") @Valid UserEntity user,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture
+    ) {
+        UserEntity updatedUser = userInterface.updateUserWithPicture(id, user, profilePicture);
+        return ResponseEntity.ok(updatedUser);
     }
-    @PutMapping("/updateuser/{ids}")
-    public UserEntity updateuser(@PathVariable("ids")Long id,@RequestBody UserEntity user)
-    {return userInterface.updateUser(id,user);}
-    @GetMapping("/getAllusers")
-    public   List<UserEntity> getAllUsers()
-    {
+
+
+
+
+    @GetMapping("/all")
+    public List<UserEntity> getAllUsers() {
         return userInterface.getAllusers();
     }
-    @GetMapping("getUserById/{id}")
-    public UserEntity getUserById(@PathVariable Long id)
-    {
+
+    @GetMapping("/{id}")
+    public UserEntity getUserById(@PathVariable Long id) {
         return userInterface.getUser(id);
     }
-    @GetMapping("getUserByUN/{un}")
-    public UserEntity getUserByUsername(@PathVariable String un)
-    {
-        return userInterface.getuserByUsername(un);
+
+    @GetMapping("/username/{username}")
+    public UserEntity getUserByUsername(@PathVariable String username) {
+        return userInterface.getuserByUsername(username);
     }
-    @GetMapping("getUsersSWuN/{un}")
-    public   List<UserEntity> getUsersSW(@PathVariable String un)
-    {
-        return userInterface.getUsersSW(un);
+
+    @GetMapping("/search/username/{username}")
+    public List<UserEntity> getUsersContainingUsername(@PathVariable String username) {
+        return userInterface.getUsersSW(username);
     }
-    @GetMapping("/getUsersByEmail")
-    public  List<UserEntity> getUsersByEmail(@RequestParam String email) {return userInterface.getUsersByEmail(email);}
+
+    @GetMapping("/search/email")
+    public List<UserEntity> getUsersByEmail(@RequestParam String email) {
+        return userInterface.getUsersByEmail(email);
+    }
 }

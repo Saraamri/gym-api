@@ -6,6 +6,7 @@ import com.example.demo.entities.UserEntity;
 import com.example.demo.services.CommentInterface;
 import com.example.demo.services.CoursCollectifInterface;
 import com.example.demo.services.UserInterface;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,63 +26,88 @@ public class CommentController {
     private UserInterface userInterface;
 
     @Autowired
-    private CoursCollectifInterface CoursCollectifInterface;
+    private CoursCollectifInterface coursCollectifInterface;
 
-    // Ajouter un commentaire sur un cours
+    // ➕ Ajouter un commentaire sur un cours
     @PostMapping("/cours/{coursId}/{userId}")
-    public ResponseEntity<?> addCommentToCours(@PathVariable Long coursId, @PathVariable Long userId, @RequestBody Comment comment) {
-        UserEntity user =  userInterface.getUserById(userId);
-        CoursCollectif cours = CoursCollectifInterface.getCoursById(coursId);
-        if (user == null || cours == null) {
-            return ResponseEntity.badRequest().body("Utilisateur ou cours introuvable");
-        }
+    public ResponseEntity<?> addCommentToCours(
+            @PathVariable Long coursId,
+            @PathVariable Long userId,
+            @RequestBody @Valid Comment comment) {
+        try {
+            UserEntity user = userInterface.getUserById(userId);
+            if (user == null) {
+                return ResponseEntity.badRequest().body("Utilisateur introuvable");
+            }
 
-        comment.setUser(user);
-        comment.setCoursCollectif(cours);
-        comment.setCreated(new Timestamp(System.currentTimeMillis()));
-        Comment saved = commentInterface.saveComment(comment);
-        return ResponseEntity.ok(saved);
+            CoursCollectif cours = coursCollectifInterface.getCoursById(coursId);
+            if (cours == null) {
+                return ResponseEntity.badRequest().body("Cours introuvable");
+            }
+
+            comment.setUser(user);
+            comment.setCoursCollectif(cours);
+            comment.setCreated(new Timestamp(System.currentTimeMillis()));
+            comment.setActive(true);
+
+            return ResponseEntity.ok(commentInterface.saveComment(comment));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Erreur interne : " + e.getMessage());
+        }
     }
 
-    // Ajouter un commentaire sur un coach
+    // ➕ Ajouter un commentaire sur un coach
     @PostMapping("/coach/{coachId}/{userId}")
-    public ResponseEntity<?> addCommentToCoach(@PathVariable Long coachId, @PathVariable Long userId, @RequestBody Comment comment) {
-        UserEntity user = userInterface.getUserById(userId);
-        UserEntity coach = userInterface.getUserById(coachId);
-        if (user == null || coach == null) {
-            return ResponseEntity.badRequest().body("Utilisateur ou coach introuvable");
+    public ResponseEntity<?> addCommentToCoach(
+            @PathVariable Long coachId,
+            @PathVariable Long userId,
+            @RequestBody @Valid Comment comment) {
+        try {
+            UserEntity user = userInterface.getUserById(userId);
+            if (user == null) {
+                return ResponseEntity.badRequest().body("Utilisateur introuvable");
+            }
+
+            UserEntity coach = userInterface.getUserById(coachId);
+            if (coach == null) {
+                return ResponseEntity.badRequest().body("Coach introuvable");
+            }
+
+            comment.setUser(user);
+            comment.setCoach(coach);
+            comment.setCreated(new Timestamp(System.currentTimeMillis()));
+            comment.setActive(true);
+
+            return ResponseEntity.ok(commentInterface.saveComment(comment));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Erreur interne : " + e.getMessage());
         }
-
-        comment.setUser(user);
-        comment.setCoach(coach);
-        comment.setCreated(new Timestamp(System.currentTimeMillis()));
-        Comment saved = commentInterface.saveComment(comment);
-        return ResponseEntity.ok(saved);
     }
 
-
-    // Récupérer les commentaires d’un cours
+    // 📥 Récupérer les commentaires d’un cours
     @GetMapping("/cours/{coursId}")
-    public ResponseEntity<?> getCommentsByCours(@PathVariable Long coursId) {
-        List<Comment> comments = commentInterface.getActiveCommentsByCoursId(coursId);
-        return ResponseEntity.ok(comments);
+    public ResponseEntity<List<Comment>> getCommentsByCours(@PathVariable Long coursId) {
+        return ResponseEntity.ok(commentInterface.getActiveCommentsByCoursId(coursId));
     }
 
-    // Récupérer les commentaires d’un coach
+    // 📥 Récupérer les commentaires d’un coach
     @GetMapping("/coach/{coachId}")
-    public ResponseEntity<?> getCommentsByCoach(@PathVariable Long coachId) {
-        List<Comment> comments = commentInterface.getActiveCommentsByCoachId(coachId);
-        return ResponseEntity.ok(comments);
+    public ResponseEntity<List<Comment>> getCommentsByCoach(@PathVariable Long coachId) {
+        return ResponseEntity.ok(commentInterface.getActiveCommentsByCoachId(coachId));
     }
 
-    // Supprimer un commentaire par l'adhérent s'il est auteur
+    // ❌ Supprimer un commentaire (si utilisateur est auteur)
     @DeleteMapping("/delete/{commentId}/user/{userId}")
-    public ResponseEntity<?> deleteCommentByUser(@PathVariable Long commentId, @PathVariable Long userId) {
+    public ResponseEntity<String> deleteCommentByUser(
+            @PathVariable Long commentId,
+            @PathVariable Long userId) {
+
         Comment comment = commentInterface.getCommentById(commentId);
         if (comment == null) {
-            return ResponseEntity.status(404).body("Commentaire non trouvé");
+            return ResponseEntity.notFound().build();
         }
-
         if (!comment.getUser().getId().equals(userId)) {
             return ResponseEntity.status(403).body("Vous n'êtes pas autorisé à supprimer ce commentaire");
         }
@@ -90,17 +116,15 @@ public class CommentController {
         return ResponseEntity.ok("Commentaire supprimé avec succès");
     }
 
-    // Désactiver un commentaire (admin uniquement)
+    // 📴 Désactiver un commentaire (admin)
     @PutMapping("/disable/{commentId}")
-    public ResponseEntity<?> disableComment(@PathVariable Long commentId) {
+    public ResponseEntity<String> disableComment(@PathVariable Long commentId) {
         Comment comment = commentInterface.getCommentById(commentId);
         if (comment == null) {
-            return ResponseEntity.status(404).body("Commentaire non trouvé");
+            return ResponseEntity.notFound().build();
         }
-
         comment.setActive(false);
         commentInterface.saveComment(comment);
         return ResponseEntity.ok("Commentaire désactivé avec succès");
     }
 }
-
