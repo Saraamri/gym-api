@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/objectif")
+@CrossOrigin(origins = "*")
 public class ObjectifController {
 
     @Autowired

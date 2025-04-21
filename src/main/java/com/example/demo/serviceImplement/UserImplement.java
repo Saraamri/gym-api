@@ -1,6 +1,7 @@
 package com.example.demo.serviceImplement;
 
 import com.example.demo.entities.Role;
+import com.example.demo.entities.RoleName;
 import com.example.demo.entities.UserEntity;
 import com.example.demo.repository.RoleRepo;
 import com.example.demo.repository.UserRepo;
@@ -25,14 +26,21 @@ public class UserImplement implements UserInterface {
     RoleRepo roleRepository;
     @Autowired
     PasswordEncoder encoder;
+
+
     @Override
     public UserEntity addUser(UserEntity user) {
-        Role defaulRole= roleRepository.findById(1L).orElse(null);
 
-        user.getRole().add(defaulRole);
+
+
+        // Encodage du mot de passe de l'utilisateur
         user.setPassword(encoder.encode(user.getPassword()));
-        return  userRepository.save(user);
+
+        // Sauvegarde de l'utilisateur dans la base de données
+        return userRepository.save(user);
     }
+
+
 
     @Override
     public void deleteUser(Long id) {

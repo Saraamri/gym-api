@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
+
 @Data
 @Table(name="users")
 
@@ -43,7 +42,7 @@ public class UserEntity implements UserDetails {
     @NotNull(message = "Le mot de passe ne peut pas être nul.")
     @Size(min = 8, message = "Le mot de passe doit contenir au moins 8 caractères.")
     private String password ;
-    @NotNull(message = "La confirmation du mot de passe ne peut pas être nulle.")
+
     @Transient
     private String confPassword;
 
@@ -60,6 +59,8 @@ public class UserEntity implements UserDetails {
     private boolean isAccountNonLocked = true;
     private String adresse;
     private String profilePicture;
+    @Transient
+    private String roleName; // Non stocké dans la base de données, utilisé juste pour l’inscription
 
     @OneToMany(mappedBy = "coach")
     private List<SeanceIndividuelle> seancesCoaches;

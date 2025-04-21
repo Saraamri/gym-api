@@ -12,9 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/abonnements")
+
 public class AbonnementController {
 
     @Autowired

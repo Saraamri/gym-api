@@ -1,11 +1,17 @@
 package com.example.demo.controllers;
+import com.example.demo.Dto.AuthRequest;
+import com.example.demo.Dto.AuthResponse;
 import com.example.demo.entities.UserEntity;
+import com.example.demo.services.AuthService;
 import com.example.demo.services.UserInterface;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -17,25 +23,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = "*")
 public class UserController {
     @Autowired
     UserInterface userInterface;
-    @GetMapping("/user")
-    public ResponseEntity<Map<String, Object>> getUser() {
-        Map<String,Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("data", "User details here");
 
-        return ResponseEntity.ok(response);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
+
+
+
+
+
+
+
     @PostMapping("/add")
-    public UserEntity addUser( @Valid @RequestBody UserEntity user)
-    {
-
-        return userInterface.addUser(user);
-    }
-    //methodelogin (finduserbyusername
-
+    public UserEntity addUser( @Valid @RequestBody UserEntity user) {return userInterface.addUser(user);}
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable Long id){
         userInterface.deleteUser(id);
@@ -45,17 +58,9 @@ public class UserController {
         userInterface.deleteUser(id);
     }
     @PostMapping("addlistusers")
-    public List<UserEntity> addlistusers(@RequestBody List<UserEntity> users)
-    {
-        return userInterface.addListUsers(users);
-    }
+    public List<UserEntity> addlistusers(@RequestBody List<UserEntity> users) {return userInterface.addListUsers(users);}
     @PostMapping("/addwithconfpassword")
-    public String addUserWTCP(@RequestBody UserEntity user)
-    {
-
-        return userInterface.addUserWTCP(user);
-    }
-
+    public String addUserWTCP(@RequestBody UserEntity user) {return userInterface.addUserWTCP(user);}
     @PostMapping("/adduserWTUN")
     public String addUserWTUN(@RequestBody UserEntity user)
     {
@@ -85,12 +90,5 @@ public class UserController {
         return userInterface.getUsersSW(un);
     }
     @GetMapping("/getUsersByEmail")
-    public  List<UserEntity> getUsersByEmail(@RequestParam String email)
-    {
-        return userInterface.getUsersByEmail(email);
-    }
-
-
-
-
+    public  List<UserEntity> getUsersByEmail(@RequestParam String email) {return userInterface.getUsersByEmail(email);}
 }

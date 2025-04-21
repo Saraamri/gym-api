@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/reservations")
 public class ReservationsController {
@@ -16,7 +16,7 @@ public class ReservationsController {
     private ReservationInterface reservationInterface;
 
     // Réserver un cours
-    @PostMapping
+    @PostMapping("/reservercours")
     public ResponseEntity<Reservation> reserverCours(@RequestParam Long adherentId, @RequestParam Long coursId) {
         Reservation reservation = reservationInterface.reserverCours(adherentId, coursId);
         return ResponseEntity.ok(reservation);

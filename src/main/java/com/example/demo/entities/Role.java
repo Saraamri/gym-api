@@ -20,6 +20,9 @@ public class Role {
     @JsonIgnore
     @ManyToMany(mappedBy = "role")
     private Set<UserEntity> user =new HashSet<>();
+    public String getRolename() {
+        return rolename != null ? rolename.name() : null;
+    }
 
 
 

@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/seances")
+@CrossOrigin(origins = "*")
 public class SeanceIndividuelleController {
 
     @Autowired
