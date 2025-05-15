@@ -81,10 +81,10 @@ public class CoursController {
         return ResponseEntity.ok(coursCollectifInterface.getCoursById(id));
     }
 
-    // (Optionnel) Récupérer les cours selon un coach par exemple
-    /*@GetMapping("/getByCoach/{coachId}")
+
+    @GetMapping("/getByCoach/{coachId}")
     public ResponseEntity<List<CoursCollectif>> getCoursByCoach(@PathVariable Long coachId) {
         return ResponseEntity.ok(coursCollectifInterface.getCoursByCoach(coachId));
-    }*/
+    }
 
 }

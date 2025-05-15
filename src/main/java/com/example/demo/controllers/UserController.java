@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.entities.RoleName;
 import com.example.demo.entities.UserEntity;
 import com.example.demo.services.UserInterface;
 import jakarta.validation.Valid;
@@ -88,4 +89,16 @@ public class UserController {
     public List<UserEntity> getUsersByEmail(@RequestParam String email) {
         return userInterface.getUsersByEmail(email);
     }
+
+    @GetMapping("/coachs")
+    public List<UserEntity> getAllCoachs(@RequestParam("role") String role) {
+        RoleName roleName = RoleName.valueOf(role);  // Convertir la chaîne en RoleName
+        return userInterface.getCoachs(roleName);
+    }
+    @GetMapping("/adherents")
+    public List<UserEntity> getAllAdherents(@RequestParam("role") String role) {
+        RoleName roleName = RoleName.valueOf(role);  // Convertir la chaîne en RoleName
+        return userInterface.getAdherents(roleName);
+    }
+
 }

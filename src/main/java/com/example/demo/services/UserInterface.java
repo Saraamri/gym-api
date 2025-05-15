@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.entities.RoleName;
 import com.example.demo.entities.UserEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,4 +38,9 @@ public interface UserInterface {
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+
+    List<UserEntity> getCoachs(RoleName roleName);
+
+    List<UserEntity> getAdherents(RoleName roleName);
 }

@@ -21,35 +21,31 @@ public class Objectif {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @Positive(message = "Le poids cible doit être supérieur à 0")
-    private double poids;
+    @NotNull(message = "Le type d'objectif est requis")
 
-    @Positive(message = "La taille cible doit être supérieure à 0")
-    private double taille;
+    private String type;
 
-    @Positive(message = "L'IMC cible doit être supérieur à 0")
-    private double imc;
+    @PositiveOrZero(message = "Les valeurs doivent être positives ou nulles")
+    private Double poidsCible; // Poids cible (si pertinent)
 
-    @PositiveOrZero(message = "Le pourcentage de graisse corporelle doit être positif ou nul")
-    private double bodyFatPercentage;
+    @PositiveOrZero(message = "Les valeurs doivent être positives ou nulles")
+    private Double tailleCible; // Taille cible (si pertinent)
 
-    @PositiveOrZero(message = "La masse musculaire doit être positive ou nulle")
-    private double muscleMass;
+    @PositiveOrZero(message = "Les valeurs doivent être positives ou nulles")
+    private Double imcCible; // IMC cible (si pertinent)
 
-    @PositiveOrZero(message = "Le tour de taille doit être positif ou nul")
-    private double waistCircumference;
+    @PositiveOrZero(message = "Les valeurs doivent être positives ou nulles")
+    private Double bodyFatPercentageCible; // Graisse corporelle cible (si pertinent)
+
+    @PositiveOrZero(message = "Les valeurs doivent être positives ou nulles")
+    private Double muscleMassCible; // Masse musculaire cible (si pertinent)
 
     @Min(value = 1, message = "La fréquence d'entraînement doit être au moins de 1 jour/semaine")
     @Max(value = 7, message = "La fréquence d'entraînement ne peut pas dépasser 7 jours/semaine")
-    private int trainingFrequency;
-
-    @PositiveOrZero(message = "L'objectif de force doit être positif ou nul")
-    private double strengthGoal;
-
-    @PositiveOrZero(message = "L'objectif de performance doit être positif ou nul")
-    private double performanceGoal;
+    private Integer frequency; // Fréquence d'entraînement par semaine
 
     @NotNull(message = "La date cible est requise")
     @Future(message = "La date cible doit être dans le futur")
-    private LocalDate targetDate;
+    private LocalDate targetDate; // Date à laquelle l'objectif doit être atteint
+
 }

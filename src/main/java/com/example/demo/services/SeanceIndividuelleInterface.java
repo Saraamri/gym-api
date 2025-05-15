@@ -20,4 +20,6 @@ public interface SeanceIndividuelleInterface {
 
     // Changer le statut de la séance (acceptée, refusée, etc.)
     SeanceIndividuelle changerStatutSeance(Long id, String statut);
+    List<SeanceIndividuelle> getSeancesProposeesParCoach();
+
 }

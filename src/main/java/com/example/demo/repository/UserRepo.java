@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import com.example.demo.entities.RoleName;
 import com.example.demo.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,9 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     boolean existsByEmail(String email);
     Optional<UserEntity> findByEmail(String email);
     UserEntity findByUsername(String username);
+
+    public List<UserEntity> findByRole(RoleName role);
+
 
 
     @Query(value = "SELECT * FROM users u WHERE u.username LIKE :cle%", nativeQuery = true)

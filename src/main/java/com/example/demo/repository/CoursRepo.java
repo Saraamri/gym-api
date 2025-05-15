@@ -7,5 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CoursRepo extends JpaRepository<CoursCollectif, Long> {
-    //List<CoursCollectif> findByUser(UserEntity coach);
+    List<CoursCollectif> findByCoach_Id(Long coachId);
+
+
 }

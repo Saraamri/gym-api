@@ -72,5 +72,10 @@ public class SeanceIndividuelleImplement implements SeanceIndividuelleInterface 
         seance.setStatut(statut);
         return repo.save(seance);
     }
+    @Override
+    public List<SeanceIndividuelle> getSeancesProposeesParCoach() {
+        return repo.findByProposeeParCoachTrueAndStatut("proposée");
+    }
+
 }
 

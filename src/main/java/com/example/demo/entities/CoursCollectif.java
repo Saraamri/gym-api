@@ -37,8 +37,8 @@ public class CoursCollectif {
 
 
 
-   // @NotNull(message = "Le coach responsable est requis")
-   // @ManyToOne
-    //@JoinColumn(name = "coach_id")
-    //private UserEntity coach;
+  @NotNull(message = "Le coach responsable est requis")
+    @ManyToOne
+    @JoinColumn(name = "coach_id")
+    private UserEntity coach;
 }

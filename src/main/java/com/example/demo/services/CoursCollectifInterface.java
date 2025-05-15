@@ -18,5 +18,7 @@ public interface CoursCollectifInterface {
 
     CoursCollectif getCoursById(Long id);
 
-   // List<CoursCollectif> getCoursByCoach(Long coachId);
+    List<CoursCollectif> getCoursByCoach(Long coachId);
+
+
 }

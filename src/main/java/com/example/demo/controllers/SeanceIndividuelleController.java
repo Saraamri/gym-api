@@ -78,5 +78,10 @@ public class SeanceIndividuelleController {
     public ResponseEntity<SeanceIndividuelle> changerStatut(@PathVariable Long id, @RequestParam String statut) {
         return ResponseEntity.ok(service.changerStatutSeance(id, statut));
     }
+    @GetMapping("/proposees")
+    public List<SeanceIndividuelle> getSeancesProposeesParCoach() {
+        return service.getSeancesProposeesParCoach();
+    }
+
 }
 

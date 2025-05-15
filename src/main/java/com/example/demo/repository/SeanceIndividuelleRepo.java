@@ -10,4 +10,6 @@ import java.util.List;
 public interface SeanceIndividuelleRepo extends JpaRepository<SeanceIndividuelle, Long> {
     List<SeanceIndividuelle> findByCoachId(Long coachId);
     List<SeanceIndividuelle> findByAdherentId(Long adherentId);
+    List<SeanceIndividuelle> findByProposeeParCoachTrueAndStatut(String statut);
+
 }

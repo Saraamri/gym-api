@@ -30,6 +30,17 @@ public class ObjectifImplement implements ObjectifInterface {
     // Méthode pour supprimer un objectif par ID
     @Override
     public void deleteObjectif(Long id) {
-        objectifRepo.deleteById(id); // Supprime un objectif de la base de données par son ID
+        objectifRepo.deleteById(id);
+
     }
+    @Override
+    public Objectif getObjectifById(Long id) {
+        return objectifRepo.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Objectif> getAllObjectifs() {
+        return objectifRepo.findAll(); // ✅ récupère tous les objectifs
+    }
+
 }

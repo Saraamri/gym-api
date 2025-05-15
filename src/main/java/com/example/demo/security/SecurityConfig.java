@@ -37,13 +37,16 @@ public class SecurityConfig implements WebMvcConfigurer{
                 .authorizeHttpRequests((authorize) -> {
                                authorize .requestMatchers(new AntPathRequestMatcher("/**")).permitAll();
 
-                   // authorize.requestMatchers("/api/auth/*","/api/user/*").permitAll();
-                   // authorize.requestMatchers(HttpMethod.POST, "/api/**").permitAll();
+                    authorize.requestMatchers("/api/auth/*","/api/user/*").permitAll();
+                    authorize.requestMatchers("/api/seances/coach/**","/api/seances/proposer").hasRole("COACH");
+                    authorize.requestMatchers("/api/seances/adherent/**","/api/seances/demande").hasRole("ADHERENT");
+
+                    // authorize.requestMatchers(HttpMethod.POST, "/api/**").permitAll();
                    authorize.anyRequest().authenticated();
                 });
 
 
-        //http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -2,6 +2,7 @@ package com.example.demo.entities;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -65,12 +66,14 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Abonnement> abonnements;
-
-
     @OneToMany(mappedBy = "coach")
-    private List<SeanceIndividuelle> seancesCoaches;
+    @JsonManagedReference("coach-seances")
+    private List<SeanceIndividuelle> seancesProposees;
+
+
 
     @OneToMany(mappedBy = "adherent")
+    @JsonManagedReference("adherent-seances")
     private List<SeanceIndividuelle> seancesAdherents;
 
     @NotNull(message = "Le rôle ne peut pas être nul.")
@@ -82,22 +85,21 @@ public class UserEntity implements UserDetails {
 
     @JsonGetter("specialite")
     public String getSpecialite() {
-        if (role == RoleName.COACH) {
+        if (role != null && role == RoleName.COACH) {
             return this.specialite;
         }
         return null;
     }
 
-    // Implémentation de la méthode getAuthorities() de UserDetails
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> "ROLE_" + role.name()); // Exemple : "ROLE_COACH", "ROLE_ADMIN", "ROLE_ADHERENT"
-    }
 
     @Override
-    public String getUsername() {
-        return username;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (role == null) return List.of();
+        return List.of(() -> "ROLE_" + role.name());
     }
+
+
+
 
 
 }

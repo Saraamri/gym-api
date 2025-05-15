@@ -7,6 +7,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,7 @@ import java.util.function.Function;
 
 @Configuration
 public class JwtProvider {
+    private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
     @Autowired
     private UserRepo userRepo;
@@ -28,27 +31,45 @@ public class JwtProvider {
     @Value("${jwt.key}")
     private String jwtKey;
 
-    public static Long extractExpirationTime(String jwtToken) {
-        return null;
+    private Key getSignKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
+
+
+    public Boolean isTokenExpired(String token) {
+        return extractAllClaims(token).getExpiration().before(new Date());
+    }
+
+
 
     public String generateToken(Authentication authentication) {
         Map<String, Object> claims = new HashMap<>();
         UserEntity user = userRepo.findByUsername(authentication.getName());
         claims.put("role", user.getRole().name());
-        // Build JWT token with claims, subject, issued time, expiration time, and signing algorithm
-        // Token valid for 3 minutes
-        return Jwts.builder()
+        claims.put("id", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("username", user.getUsername());
+
+
+        Date now = new Date(System.currentTimeMillis());
+        Date expiration = new Date(now.getTime() + 1000 * 60 * 3);
+
+        logger.info("Date d'expiration du token : {}", expiration);
+        return  Jwts.builder()
                 .setClaims(claims)
                 .setSubject(authentication.getName())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 3))
+                .setIssuedAt(now)
+                .setExpiration(expiration) // 3 minutes
+                .signWith(getSignKey(), SignatureAlgorithm.HS256) // signer ici AVANT compact
                 .compact();
-              //  .signWith( SignatureAlgorithm.HS256).compact();
     }
+
+
     private Claims extractAllClaims(String token) {
         // Parse and return all claims from the token
         return Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
 
                 .build().parseClaimsJws(token).getBody();
     }
@@ -65,6 +86,9 @@ public class JwtProvider {
         // Extract username from token and check if it matches UserDetails' username
         final String userName = extractUserName(token);
         // Also check if the token is expired
-        return (userName.equals(userDetails.getUsername())) ;
+        return (userName.equals(userDetails.getUsername())&& !isTokenExpired(token)) ;
+    }
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 }

@@ -113,4 +113,9 @@ public class CoursImplement implements CoursCollectifInterface {
         return coursRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cours non trouvé avec l'ID : " + id));
     }
+
+    @Override
+    public List<CoursCollectif> getCoursByCoach(Long coachId) {
+        return coursRepo.findByCoach_Id(coachId);
+    }
 }

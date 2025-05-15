@@ -4,6 +4,7 @@ import com.example.demo.entities.Objectif;
 import com.example.demo.entities.UserEntity;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface ObjectifInterface {
     // Méthode pour sauvegarder un objectif
@@ -14,4 +15,9 @@ public interface ObjectifInterface {
 
     // Méthode pour supprimer un objectif par ID
     void deleteObjectif(Long id);
+    Objectif getObjectifById(Long id);
+
+    List<Objectif> getAllObjectifs();
+
+
 }

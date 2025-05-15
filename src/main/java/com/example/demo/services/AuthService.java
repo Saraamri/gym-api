@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -44,7 +46,9 @@ public class AuthService {
 
         String token = jwtProvider.generateToken(auth);
 
+      Date expirationDate = jwtProvider.extractExpiration(token);
+     long expiresAt = expirationDate != null ? expirationDate.getTime() : null;
 
-        return new AuthResponse(token,authRequest.getUsername(),null);
-    }
-}
+        return new AuthResponse(token,authRequest.getUsername(), expiresAt);
+
+}}

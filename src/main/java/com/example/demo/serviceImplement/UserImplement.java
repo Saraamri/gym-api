@@ -1,5 +1,6 @@
 package com.example.demo.serviceImplement;
 
+import com.example.demo.entities.RoleName;
 import com.example.demo.entities.UserEntity;
 import com.example.demo.repository.UserRepo;
 import com.example.demo.services.UserInterface;
@@ -183,6 +184,16 @@ public class UserImplement implements UserInterface {
     @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+    @Override
+    public List<UserEntity> getCoachs(RoleName role) {
+
+        return userRepository.findByRole(role);
+    }
+
+    @Override
+    public List<UserEntity> getAdherents(RoleName role) {
+        return userRepository.findByRole(role);
     }
 
 
