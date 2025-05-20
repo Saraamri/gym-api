@@ -32,5 +32,9 @@ public interface ReservationInterface {
     // Récupérer les réservations pour un cours collectif spécifique
     List<Reservation> getReservationsByCours(Long coursID);
     Reservation reserverCours(Long adherentId, Long coursId);
+
+    boolean updateStatutReservation(Long id, String statut);
+
+    List<Reservation> getReservationsByCoach(Long coachId);
 }
 

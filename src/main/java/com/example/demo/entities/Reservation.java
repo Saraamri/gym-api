@@ -26,12 +26,12 @@ public class Reservation {
     @NotBlank(message = "Le statut de la réservation est obligatoire")
     private String statut;
 
-   // @NotNull(message = "L'adhérent est obligatoire")
+    @NotNull(message = "L'adhérent est obligatoire")
     @ManyToOne
     @JoinColumn(name = "adherent_id")
     private UserEntity adherent;
 
-   // @NotNull(message = "Le cours collectif est obligatoire")
+    @NotNull(message = "Le cours collectif est obligatoire")
     @ManyToOne
     @JoinColumn(name = "cours_id")
     private CoursCollectif cours;

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationImplement implements ReservationInterface {
@@ -115,5 +116,25 @@ public class ReservationImplement implements ReservationInterface {
 
         return reservationRepo.save(reservation);
     }
+    public boolean updateStatutReservation(Long id, String statut) {
+        Optional<Reservation> optReservation = reservationRepo.findById(id);
+        if (optReservation.isPresent()) {
+            Reservation reservation = optReservation.get();
+            reservation.setStatut(statut);
+            reservationRepo.save(reservation);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public List<Reservation> getReservationsByCoach(Long coachId) {
+        List<Reservation> allReservations = reservationRepo.findAll();
+        return allReservations.stream()
+                .filter(r -> r.getCours() != null && r.getCours().getCoach() != null
+                        && r.getCours().getCoach().getId().equals(coachId))
+                .collect(Collectors.toList());
+    }
+
 }
 

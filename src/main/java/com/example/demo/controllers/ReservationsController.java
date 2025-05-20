@@ -41,5 +41,28 @@ public class ReservationsController {
     public List<Reservation> getReservationsByCours(@PathVariable Long id) {
         return reservationInterface.getReservationsByCours(id);
     }
+
+    @GetMapping("/coach/{coachId}")
+    public ResponseEntity<List<Reservation>> getReservationsByCoach(@PathVariable Long coachId) {
+        List<Reservation> reservations = reservationInterface.getReservationsByCoach(coachId);
+        return ResponseEntity.ok(reservations);
+    }
+
+    @PutMapping("/{id}/confirmer")
+    public ResponseEntity<?> confirmerReservation(@PathVariable Long id) {
+        boolean updated = reservationInterface.updateStatutReservation(id, "CONFIRMEE");
+        if (updated) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Réservation non trouvée");
+    }
+    @PutMapping("/{id}/annuler")
+    public ResponseEntity<?> annulerReservation(@PathVariable Long id) {
+        boolean updated = reservationInterface.updateStatutReservation(id, "ANNULEE");
+        if (updated) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Réservation non trouvée");
+    }
 }
 
