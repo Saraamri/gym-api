@@ -1,8 +1,11 @@
 package com.example.demo.controllers;
 
+import com.example.demo.entities.ChangePasswordRequest;
+import com.example.demo.entities.CoursCollectif;
 import com.example.demo.entities.RoleName;
 import com.example.demo.entities.UserEntity;
 import com.example.demo.services.UserInterface;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,17 +56,21 @@ public class UserController {
 
 
     @PutMapping(path = "/updateWithPicture/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> updateUserWithPicture(
+    public ResponseEntity<UserEntity> updateUserWithPicture(
             @PathVariable Long id,
-            @RequestPart("user") @Valid UserEntity user,
+            @RequestPart("user") @Valid String userJson,
             @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture
     ) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+             UserEntity  user = objectMapper.readValue(userJson, UserEntity.class);
         UserEntity updatedUser = userInterface.updateUserWithPicture(id, user, profilePicture);
         return ResponseEntity.ok(updatedUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
-
-
-
 
     @GetMapping("/all")
     public List<UserEntity> getAllUsers() {
@@ -100,5 +107,12 @@ public class UserController {
         RoleName roleName = RoleName.valueOf(role);  // Convertir la chaîne en RoleName
         return userInterface.getAdherents(roleName);
     }
+
+    @PostMapping("/changePassword/{id}")
+    public ResponseEntity<?> changePassword(@PathVariable Long id, @RequestBody ChangePasswordRequest request) {
+        userInterface.changePassword(id, request.getOldPassword(), request.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
 
 }

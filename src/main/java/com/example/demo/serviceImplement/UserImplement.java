@@ -196,5 +196,18 @@ public class UserImplement implements UserInterface {
         return userRepository.findByRole(role);
     }
 
+    @Override
+    public void changePassword(Long id, String oldPassword, String newPassword) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé."));
+
+        if (!encoder.matches(oldPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Ancien mot de passe incorrect.");
+        }
+
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
 
 }

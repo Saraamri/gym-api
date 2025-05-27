@@ -43,4 +43,6 @@ public interface UserInterface {
     List<UserEntity> getCoachs(RoleName roleName);
 
     List<UserEntity> getAdherents(RoleName roleName);
+
+    void changePassword(Long id, String oldPassword, String newPassword);
 }

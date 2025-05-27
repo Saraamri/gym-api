@@ -83,6 +83,8 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
+
+
     @JsonGetter("specialite")
     public String getSpecialite() {
         if (role != null && role == RoleName.COACH) {
@@ -97,6 +99,7 @@ public class UserEntity implements UserDetails {
         if (role == null) return List.of();
         return List.of(() -> "ROLE_" + role.name());
     }
+
 
 
 

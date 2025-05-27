@@ -29,8 +29,18 @@ public class Progress {
     @DecimalMin(value = "0.0", inclusive = false, message = "L'IMC doit être supérieur à 0")
     private double imc;
 
+    @PositiveOrZero(message = "Les valeurs doivent être positives ou nulles")
+    private Double bodyFatPercentage;
+
+    @PositiveOrZero(message = "Les valeurs doivent être positives ou nulles")
+    private Double muscleMass;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
-   // @NotNull(message = "L'utilisateur est requis")
+    @NotNull(message = "L'utilisateur est requis")
     private UserEntity user;
+    @ManyToOne
+    @JoinColumn(name = "objectif_id")
+    private Objectif objectif;
+
 }
