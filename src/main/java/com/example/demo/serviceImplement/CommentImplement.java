@@ -38,5 +38,10 @@ public class CommentImplement implements CommentInterface {
     public List<Comment> getActiveCommentsByCoachId(Long coachId) {
         return commentRepo.findByCoachIdAndActiveTrue(coachId);
     }
+    @Override
+    public List<Comment> getAllComments() {
+        return commentRepo.findAll(); // ou un tri si nécessaire
+    }
+
 }
 

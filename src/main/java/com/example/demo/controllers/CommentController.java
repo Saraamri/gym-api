@@ -1,8 +1,10 @@
 package com.example.demo.controllers;
 
+import com.example.demo.Dto.CommentDTO;
 import com.example.demo.entities.Comment;
 import com.example.demo.entities.CoursCollectif;
 import com.example.demo.entities.UserEntity;
+import com.example.demo.repository.CommentRepo;
 import com.example.demo.services.CommentInterface;
 import com.example.demo.services.CoursCollectifInterface;
 import com.example.demo.services.UserInterface;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/comments")
@@ -27,6 +30,8 @@ public class CommentController {
 
     @Autowired
     private CoursCollectifInterface coursCollectifInterface;
+    @Autowired
+    private CommentRepo commentRepo;
 
     // ➕ Ajouter un commentaire sur un cours
     @PostMapping("/cours/{coursId}/{userId}")
@@ -38,6 +43,9 @@ public class CommentController {
             UserEntity user = userInterface.getUserById(userId);
             if (user == null) {
                 return ResponseEntity.badRequest().body("Utilisateur introuvable");
+            }
+            if (isEmpty(user.getFirstName()) || isEmpty(user.getLastName())) {
+                return ResponseEntity.badRequest().body("Le prénom et le nom de l'utilisateur sont obligatoires");
             }
 
             CoursCollectif cours = coursCollectifInterface.getCoursById(coursId);
@@ -57,48 +65,22 @@ public class CommentController {
         }
     }
 
-    // ➕ Ajouter un commentaire sur un coach
-    @PostMapping("/coach/{coachId}/{userId}")
-    public ResponseEntity<?> addCommentToCoach(
-            @PathVariable Long coachId,
-            @PathVariable Long userId,
-            @RequestBody @Valid Comment comment) {
-        try {
-            UserEntity user = userInterface.getUserById(userId);
-            if (user == null) {
-                return ResponseEntity.badRequest().body("Utilisateur introuvable");
-            }
 
-            UserEntity coach = userInterface.getUserById(coachId);
-            if (coach == null) {
-                return ResponseEntity.badRequest().body("Coach introuvable");
-            }
-
-            comment.setUser(user);
-            comment.setCoach(coach);
-            comment.setCreated(new Timestamp(System.currentTimeMillis()));
-            comment.setActive(true);
-
-            return ResponseEntity.ok(commentInterface.saveComment(comment));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Erreur interne : " + e.getMessage());
-        }
-    }
-
-    // 📥 Récupérer les commentaires d’un cours
     @GetMapping("/cours/{coursId}")
-    public ResponseEntity<List<Comment>> getCommentsByCours(@PathVariable Long coursId) {
-        return ResponseEntity.ok(commentInterface.getActiveCommentsByCoursId(coursId));
+    public List<CommentDTO> getCommentsByCours(@PathVariable Long coursId) {
+        List<Comment> comments = commentRepo.findByCoursCollectifIdAndActiveTrue(coursId);
+        return comments.stream()
+                .map(CommentDTO::new)
+                .collect(Collectors.toList());
     }
 
-    // 📥 Récupérer les commentaires d’un coach
-    @GetMapping("/coach/{coachId}")
-    public ResponseEntity<List<Comment>> getCommentsByCoach(@PathVariable Long coachId) {
-        return ResponseEntity.ok(commentInterface.getActiveCommentsByCoachId(coachId));
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Comment>> getAllComments() {
+        return ResponseEntity.ok(commentInterface.getAllComments());
     }
 
-    // ❌ Supprimer un commentaire (si utilisateur est auteur)
+
     @DeleteMapping("/delete/{commentId}/user/{userId}")
     public ResponseEntity<String> deleteCommentByUser(
             @PathVariable Long commentId,
@@ -116,6 +98,8 @@ public class CommentController {
         return ResponseEntity.ok("Commentaire supprimé avec succès");
     }
 
+
+
     // 📴 Désactiver un commentaire (admin)
     @PutMapping("/disable/{commentId}")
     public ResponseEntity<String> disableComment(@PathVariable Long commentId) {
@@ -126,5 +110,10 @@ public class CommentController {
         comment.setActive(false);
         commentInterface.saveComment(comment);
         return ResponseEntity.ok("Commentaire désactivé avec succès");
+    }
+
+    // 🔧 Méthode utilitaire pour vérifier si une chaîne est vide ou nulle
+    private boolean isEmpty(String str) {
+        return str == null || str.trim().isEmpty();
     }
 }

@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface ProgressRepo extends JpaRepository<Progress, Long> {
     List<Progress> findByUser(UserEntity user);
+    List<Progress> findByObjectifId(Long objectifId);
+
 }
-//........

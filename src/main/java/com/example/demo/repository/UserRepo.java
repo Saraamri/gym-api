@@ -20,6 +20,8 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     UserEntity findByUsername(String username);
 
     public List<UserEntity> findByRole(RoleName role);
+    int countByRole(RoleName role);
+
 
 
 

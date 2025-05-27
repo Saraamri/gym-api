@@ -1,5 +1,6 @@
 package com.example.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -40,5 +41,6 @@ public class CoursCollectif {
   @NotNull(message = "Le coach responsable est requis")
     @ManyToOne
     @JoinColumn(name = "coach_id")
+  @JsonBackReference
     private UserEntity coach;
 }

@@ -1,5 +1,6 @@
 package com.example.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,16 +25,16 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-
-    private UserEntity user; // adhérent auteur du commentaire
+    @JsonBackReference
+    private UserEntity user;
 
     @ManyToOne
     @JoinColumn(name = "cours_id", nullable = true)
-    private CoursCollectif coursCollectif; // cours commenté (optionnel)
+    private CoursCollectif coursCollectif;
 
     @ManyToOne
     @JoinColumn(name = "coach_id", nullable = true)
-    private UserEntity coach; // coach commenté (optionnel)
+    private UserEntity coach;
     @PrePersist
     protected void onCreate() {
         this.created = new Timestamp(System.currentTimeMillis());

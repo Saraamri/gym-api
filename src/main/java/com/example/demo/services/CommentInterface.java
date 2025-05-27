@@ -10,5 +10,7 @@ public interface CommentInterface {
     void deleteComment(Long id);
     List<Comment> getActiveCommentsByCoursId(Long coursId);
     List<Comment> getActiveCommentsByCoachId(Long coachId);
+    List<Comment> getAllComments();
+
 }
 

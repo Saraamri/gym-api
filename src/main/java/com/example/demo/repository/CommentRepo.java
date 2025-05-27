@@ -8,5 +8,6 @@ import java.util.List;
 public interface CommentRepo extends JpaRepository<Comment, Long> {
     List<Comment> findByCoursCollectifIdAndActiveTrue(Long coursId);
     List<Comment> findByCoachIdAndActiveTrue(Long coachId);
+    long countByActiveTrue();
 }
 
