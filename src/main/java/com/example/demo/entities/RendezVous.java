@@ -18,7 +18,6 @@ public class RendezVous {
     @NotNull
     private LocalDateTime dateHeure;
 
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     //@NotNull(message = "L'utilisateur est requis")
